@@ -57,4 +57,32 @@ class RequestHandlerTest {
 
         assertThat(socket.output()).isEqualTo(expected);
     }
+
+    @Test
+    void css() throws IOException, URISyntaxException {
+        // given
+        final String httpRequest = String.join("\r\n",
+                "GET ./css/styles.css HTTP/1.1 ",
+                "Host: localhost:8080 ",
+                "Connection: keep-alive ",
+                "",
+                "");
+
+        final var socket = new StubSocket(httpRequest);
+        final RequestHandler handler = new RequestHandler(socket);
+
+        // when
+        handler.run();
+
+        // then
+
+
+        var expected = "HTTP/1.1 200 OK \r\n" +
+                "Content-Type: text/css;charset=utf-8 \r\n" +
+                "Content-Length: 7065 \r\n" +
+                "\r\n" +
+                new String(FileIoUtils.loadFileFromClasspath("static/css/styles.css"));
+
+        assertThat(socket.output()).isEqualTo(expected);
+    }
 }

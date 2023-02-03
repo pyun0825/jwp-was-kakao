@@ -37,15 +37,32 @@ public class RequestHandler implements Runnable {
 
     private void handleGet(Headers headers, DataOutputStream dos) throws IOException, URISyntaxException {
         String url = headers.getUrl();
+        if (url.endsWith(".html")) {
+            responseHtml(url, dos);
+            return;
+        }
+        if (url.endsWith(".css")) {
+            responseCss(url, dos);
+            return;
+        }
+    }
+
+    private void responseHtml(String url, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + url);
-        response200Header(dos, body.length);
+        response200Header(dos, body.length, "text/html");
         responseBody(dos, body);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void responseCss(String url, DataOutputStream dos) throws IOException, URISyntaxException {
+        byte[] body = FileIoUtils.loadFileFromClasspath("./static/" + url.substring(1));
+        response200Header(dos, body.length, "text/css");
+        responseBody(dos, body);
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8 \r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8 \r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + " \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

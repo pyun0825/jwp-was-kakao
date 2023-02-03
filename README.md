@@ -19,7 +19,7 @@
 - [x] RequestHandlerTest 테스트가 모두 통과하도록 구현한다.
 
 ### CSS 지원하기
-- [ ] 인덱스 페이지에 접속하면, 현재 stylesheet 파일을 지원하지 못하고 있다. Stylesheet 파일을 지원하도록 구현하도록 한다.
+- [x] 인덱스 페이지에 접속하면, 현재 stylesheet 파일을 지원하지 못하고 있다. Stylesheet 파일을 지원하도록 구현하도록 한다.
 
 ### Query String 파싱
 - [ ] “회원가입” 메뉴를 클릭하면 http://localhost:8080/user/form.html 으로 이동하면서 회원가입할 수 있다.
