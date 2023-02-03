@@ -21,4 +21,8 @@ public class Headers {
     public String getUrl() {
         return this.headers.get("URL");
     }
+
+    public Integer getContentLength() {
+        return Integer.parseInt(this.headers.get("Content-Length"));
+    }
 }

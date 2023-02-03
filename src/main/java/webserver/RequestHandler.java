@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import utils.HeaderParser;
+import utils.IOUtils;
 import utils.RequestParameterParser;
 
 import java.io.*;
@@ -33,6 +34,10 @@ public class RequestHandler implements Runnable {
             if ("GET".equals(headers.getHttpMethod())) {
                 handleGet(headers, dos);
             }
+            if ("POST".equals(headers.getHttpMethod())) {
+                handlePost(headers, br, dos);
+            }
+
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
@@ -49,7 +54,16 @@ public class RequestHandler implements Runnable {
             return;
         }
         if (url.startsWith("/user/create")) {
-            responseRegister(url, dos);
+            String[] splitUrl = url.split("\\?");
+            responseRegister(splitUrl[1], dos);
+            return;
+        }
+    }
+
+    private void handlePost(Headers headers, BufferedReader br, DataOutputStream dos) throws IOException {
+        String url = headers.getUrl();
+        if (url.startsWith("/user/create")) {
+            responseRegister(IOUtils.readData(br, headers.getContentLength()), dos);
             return;
         }
     }
@@ -66,8 +80,8 @@ public class RequestHandler implements Runnable {
         responseBody(dos, body);
     }
 
-    private void responseRegister(String url, DataOutputStream dos) {
-        RequestParameters requestParameters = RequestParameterParser.parse(url);
+    private void responseRegister(String params, DataOutputStream dos) {
+        RequestParameters requestParameters = RequestParameterParser.parse(params);
         DataBase.addUser(new User(
                 requestParameters.get("userId"),
                 requestParameters.get("password"),
