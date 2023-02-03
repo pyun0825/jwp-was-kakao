@@ -11,8 +11,12 @@
 ## 기능 요구사항
 
 ### GET /index.html 응답하기
-- [ ] http://localhost:8080/index.html 에 접근할 수 있도록 구현한다.
-- [ ] RequestHandlerTest 테스트가 모두 통과하도록 구현한다.
+- [x] http://localhost:8080/index.html 에 접근할 수 있도록 구현한다.
+  - GET 요청을 catch
+  - header에서 리소스 주소 get
+  - `FileIoUtils.loadFileFromClasspath`를 이용해서 byte[] 변환
+  - response body에 담아 보내기 (`responseBody`)
+- [x] RequestHandlerTest 테스트가 모두 통과하도록 구현한다.
 
 ### CSS 지원하기
 - [ ] 인덱스 페이지에 접속하면, 현재 stylesheet 파일을 지원하지 못하고 있다. Stylesheet 파일을 지원하도록 구현하도록 한다.
