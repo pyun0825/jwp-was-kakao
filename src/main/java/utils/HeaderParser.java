@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class HeaderParser {
-
     public static Headers parse(BufferedReader br) {
         Headers headers = new Headers();
         parseFirstLine(headers, br);

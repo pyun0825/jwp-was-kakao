@@ -1,9 +1,12 @@
 package webserver;
 
+import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import utils.HeaderParser;
+import utils.RequestParameterParser;
 
 import java.io.*;
 import java.net.Socket;
@@ -45,6 +48,10 @@ public class RequestHandler implements Runnable {
             responseCss(url, dos);
             return;
         }
+        if (url.startsWith("/user/create")) {
+            responseRegister(url, dos);
+            return;
+        }
     }
 
     private void responseHtml(String url, DataOutputStream dos) throws IOException, URISyntaxException {
@@ -59,11 +66,32 @@ public class RequestHandler implements Runnable {
         responseBody(dos, body);
     }
 
+    private void responseRegister(String url, DataOutputStream dos) {
+        RequestParameters requestParameters = RequestParameterParser.parse(url);
+        DataBase.addUser(new User(
+                requestParameters.get("userId"),
+                requestParameters.get("password"),
+                requestParameters.get("name"),
+                requestParameters.get("email"))
+        );
+        response302Header(dos, "/index.html");
+    }
+
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8 \r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + " \r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location);
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
