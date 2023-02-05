@@ -4,6 +4,7 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import utils.FileIoUtils;
 import utils.HeaderParser;
 import utils.IOUtils;
@@ -32,20 +33,30 @@ public class RequestHandler implements Runnable {
              OutputStream out = connection.getOutputStream();
              DataOutputStream dos = new DataOutputStream(out))
         {
-            Headers headers = HeaderParser.parse(br);
-            if ("GET".equals(headers.getHttpMethod())) {
-                handleGet(headers, dos);
+            HttpRequest httpRequest = getHttpRequestFromInput(br);
+            if (HttpMethod.GET.equals(httpRequest.getHttpMethod())) {
+                handleGet(httpRequest, dos);
             }
-            if ("POST".equals(headers.getHttpMethod())) {
-                handlePost(headers, br, dos);
+            if (HttpMethod.POST.equals(httpRequest.getHttpMethod())) {
+                handlePost(httpRequest, dos);
             }
         } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
         }
     }
 
-    private void handleGet(Headers headers, DataOutputStream dos) throws IOException, URISyntaxException {
-        String url = headers.getUrl();
+    private HttpRequest getHttpRequestFromInput(BufferedReader br) throws IOException {
+        Headers headers = HeaderParser.parse(br);
+        String body = null;
+        if (headers.hasContentLength()) {
+            body = IOUtils.readData(br, headers.getContentLength());
+        }
+        return new HttpRequest(headers, body);
+    }
+
+    private void handleGet(HttpRequest httpRequest, DataOutputStream dos) throws IOException, URISyntaxException {
+        String url = httpRequest.getRequestUrl();
         if (url.endsWith(".html")) {
             responseHtml(url, dos);
             return;
@@ -61,10 +72,10 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void handlePost(Headers headers, BufferedReader br, DataOutputStream dos) throws IOException {
-        String url = headers.getUrl();
+    private void handlePost(HttpRequest httpRequest, DataOutputStream dos) throws IOException {
+        String url = httpRequest.getRequestUrl();
         if (url.startsWith("/user/create")) {
-            responseRegister(IOUtils.readData(br, headers.getContentLength()), dos);
+            responseRegister(httpRequest.getBody(), dos);
             return;
         }
     }

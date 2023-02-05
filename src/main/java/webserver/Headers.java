@@ -1,5 +1,7 @@
 package webserver;
 
+import org.springframework.http.HttpMethod;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,12 +16,16 @@ public class Headers {
         this.headers.put(key, value);
     }
 
-    public String getHttpMethod() {
-        return this.headers.get("Method");
+    public HttpMethod getHttpMethod() {
+        return HttpMethod.resolve(this.headers.get("Method"));
     }
 
     public String getUrl() {
         return this.headers.get("URL");
+    }
+
+    public boolean hasContentLength() {
+        return this.headers.containsKey("Content-Length");
     }
 
     public Integer getContentLength() {
