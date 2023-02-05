@@ -26,10 +26,12 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            DataOutputStream dos = new DataOutputStream(out);
-
+        try (InputStream in = connection.getInputStream();
+             InputStreamReader isr = new InputStreamReader(in);
+             BufferedReader br = new BufferedReader(isr);
+             OutputStream out = connection.getOutputStream();
+             DataOutputStream dos = new DataOutputStream(out))
+        {
             Headers headers = HeaderParser.parse(br);
             if ("GET".equals(headers.getHttpMethod())) {
                 handleGet(headers, dos);
@@ -37,7 +39,6 @@ public class RequestHandler implements Runnable {
             if ("POST".equals(headers.getHttpMethod())) {
                 handlePost(headers, br, dos);
             }
-
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
