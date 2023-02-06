@@ -1,8 +1,13 @@
 package webserver;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import support.StubSocket;
 import utils.FileIoUtils;
+import webserver.handler.UserCreateGetHandler;
+import webserver.handler.UserCreatePostHandler;
+import webserver.handlermapper.RequestHandlerMapping;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,6 +15,14 @@ import java.net.URISyntaxException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestHandlerTest {
+    private RequestHandlerMapping requestHandlerMapping;
+
+    @BeforeEach
+    void init() {
+        requestHandlerMapping = new RequestHandlerMapping()
+                .registerHandler("/user/create", HttpMethod.POST, new UserCreatePostHandler())
+                .registerHandler("/user/create", HttpMethod.GET, new UserCreateGetHandler());
+    }
 //    @Test
 //    void socket_out() {
 //        // given
@@ -41,7 +54,7 @@ class RequestHandlerTest {
                 "");
 
         final var socket = new StubSocket(httpRequest);
-        final RequestHandler handler = new RequestHandler(socket);
+        final RequestHandler handler = new RequestHandler(requestHandlerMapping, socket);
 
         // when
         handler.run();
@@ -69,7 +82,7 @@ class RequestHandlerTest {
                 "");
 
         final var socket = new StubSocket(httpRequest);
-        final RequestHandler handler = new RequestHandler(socket);
+        final RequestHandler handler = new RequestHandler(requestHandlerMapping, socket);
 
         // when
         handler.run();
