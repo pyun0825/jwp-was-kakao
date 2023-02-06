@@ -5,7 +5,6 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 import utils.HeaderParser;
 import utils.IOUtils;
@@ -83,17 +82,17 @@ public class RequestHandler implements Runnable {
 
     private void responseHtml(String url, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + url);
-        response200Header(dos, body.length, "text/html");
-        responseBody(dos, body);
+        HttpResponse httpResponse = HttpResponse.ok(body).setContentType("text/html").setContentLength();
+        httpResponse.sendResponse(dos);
     }
 
     private void responseCss(String url, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath("./static/" + url.substring(1));
-        response200Header(dos, body.length, "text/css");
-        responseBody(dos, body);
+        HttpResponse httpResponse = HttpResponse.ok(body).setContentType("text/css").setContentLength();
+        httpResponse.sendResponse(dos);
     }
 
-    private void responseRegister(String params, DataOutputStream dos) {
+    private void responseRegister(String params, DataOutputStream dos) throws IOException {
         RequestParameters requestParameters = RequestParameterParser.parse(params);
         DataBase.addUser(new User(
                 requestParameters.get("userId"),
@@ -101,38 +100,7 @@ public class RequestHandler implements Runnable {
                 requestParameters.get("name"),
                 requestParameters.get("email"))
         );
-        response302Header(dos, "/index.html");
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            String responseHeader = new ResponseHeader(HttpStatus.OK)
-                    .addContentType(contentType)
-                    .addContentLength(lengthOfBodyContent)
-                    .buildToString();
-            dos.writeBytes(responseHeader);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String location) {
-        try {
-            String responseHeader = new ResponseHeader(HttpStatus.FOUND)
-                    .addLocation(location)
-                    .buildToString();
-            dos.writeBytes(responseHeader);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        HttpResponse httpResponse = HttpResponse.found().setLocation("/index.html");
+        httpResponse.sendResponse(dos);
     }
 }
