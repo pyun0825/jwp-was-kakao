@@ -1,14 +1,24 @@
 package webserver;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestHeader {
+    @NonNull
+    private final HttpMethod httpMethod;
+    @NonNull
+    private final String url;
+    @NonNull
+    private final String httpVersion;
     private final Map<String, String> headers;
 
-    public RequestHeader() {
+    public RequestHeader(HttpMethod httpMethod, String url, String httpVersion) {
+        this.httpMethod = httpMethod;
+        this.url = url;
+        this.httpVersion = httpVersion;
         this.headers = new HashMap<>();
     }
 
@@ -17,11 +27,11 @@ public class RequestHeader {
     }
 
     public HttpMethod getHttpMethod() {
-        return HttpMethod.resolve(this.headers.get("Method"));
+        return this.httpMethod;
     }
 
     public String getUrl() {
-        return this.headers.get("URL");
+        return this.url;
     }
 
     public boolean hasContentLength() {
