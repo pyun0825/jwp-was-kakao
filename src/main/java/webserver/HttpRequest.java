@@ -6,17 +6,17 @@ import org.springframework.lang.Nullable;
 
 public class HttpRequest {
     @NonNull
-    private final Headers headers;
+    private final RequestHeader requestHeader;
     @Nullable
     private final String body;
 
-    public HttpRequest(Headers headers, String body) {
-        this.headers = headers;
+    public HttpRequest(RequestHeader requestHeader, String body) {
+        this.requestHeader = requestHeader;
         this.body = body;
     }
 
-    public Headers getHeaders() {
-        return headers;
+    public RequestHeader getHeaders() {
+        return requestHeader;
     }
 
     public String getBody() {
@@ -24,10 +24,10 @@ public class HttpRequest {
     }
 
     public HttpMethod getHttpMethod() {
-        return headers.getHttpMethod();
+        return requestHeader.getHttpMethod();
     }
 
     public String getRequestUrl() {
-        return headers.getUrl();
+        return requestHeader.getUrl();
     }
 }

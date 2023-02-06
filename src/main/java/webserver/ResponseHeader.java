@@ -4,31 +4,30 @@ import org.springframework.http.HttpStatus;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-public class HeaderBuilder {
+public class ResponseHeader {
     private final HttpStatus httpStatus;
     private final Map<String, String > preHeaders;
 
-    public HeaderBuilder(HttpStatus httpStatus) {
+    public ResponseHeader(HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
         this.preHeaders = new LinkedHashMap<>();
     }
 
-    public HeaderBuilder addHeader(String key, String value) {
+    public ResponseHeader addHeader(String key, String value) {
         preHeaders.put(key, value);
         return this;
     }
 
-    public HeaderBuilder addContentType(String contentType) {
+    public ResponseHeader addContentType(String contentType) {
         return addHeader("Content-Type", contentType + ";charset=utf-8");
     }
 
-    public HeaderBuilder addContentLength(int contentLength) {
+    public ResponseHeader addContentLength(int contentLength) {
         return addHeader("Content-Length", String.valueOf(contentLength));
     }
 
-    public HeaderBuilder addLocation(String location) {
+    public ResponseHeader addLocation(String location) {
         return addHeader("Location", location);
     }
 

@@ -5,10 +5,10 @@ import org.springframework.http.HttpMethod;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Headers {
+public class RequestHeader {
     private final Map<String, String> headers;
 
-    public Headers() {
+    public RequestHeader() {
         this.headers = new HashMap<>();
     }
 

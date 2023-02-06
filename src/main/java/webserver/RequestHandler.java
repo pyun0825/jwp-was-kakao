@@ -48,12 +48,12 @@ public class RequestHandler implements Runnable {
     }
 
     private HttpRequest getHttpRequestFromInput(BufferedReader br) throws IOException {
-        Headers headers = HeaderParser.parse(br);
+        RequestHeader requestHeader = HeaderParser.parse(br);
         String body = null;
-        if (headers.hasContentLength()) {
-            body = IOUtils.readData(br, headers.getContentLength());
+        if (requestHeader.hasContentLength()) {
+            body = IOUtils.readData(br, requestHeader.getContentLength());
         }
-        return new HttpRequest(headers, body);
+        return new HttpRequest(requestHeader, body);
     }
 
     private void handleGet(HttpRequest httpRequest, DataOutputStream dos) throws IOException, URISyntaxException {
@@ -106,7 +106,7 @@ public class RequestHandler implements Runnable {
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
-            String responseHeader = new HeaderBuilder(HttpStatus.OK)
+            String responseHeader = new ResponseHeader(HttpStatus.OK)
                     .addContentType(contentType)
                     .addContentLength(lengthOfBodyContent)
                     .buildToString();
@@ -118,7 +118,7 @@ public class RequestHandler implements Runnable {
 
     private void response302Header(DataOutputStream dos, String location) {
         try {
-            String responseHeader = new HeaderBuilder(HttpStatus.FOUND)
+            String responseHeader = new ResponseHeader(HttpStatus.FOUND)
                     .addLocation(location)
                     .buildToString();
             dos.writeBytes(responseHeader);
