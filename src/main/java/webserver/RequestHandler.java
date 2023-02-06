@@ -5,6 +5,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 import utils.HeaderParser;
 import utils.IOUtils;
@@ -105,10 +106,11 @@ public class RequestHandler implements Runnable {
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8 \r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + " \r\n");
-            dos.writeBytes("\r\n");
+            String responseHeader = new HeaderBuilder(HttpStatus.OK)
+                    .addContentType(contentType)
+                    .addContentLength(lengthOfBodyContent)
+                    .buildToString();
+            dos.writeBytes(responseHeader);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -116,9 +118,10 @@ public class RequestHandler implements Runnable {
 
     private void response302Header(DataOutputStream dos, String location) {
         try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + location);
-            dos.writeBytes("\r\n");
+            String responseHeader = new HeaderBuilder(HttpStatus.FOUND)
+                    .addLocation(location)
+                    .buildToString();
+            dos.writeBytes(responseHeader);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
