@@ -13,7 +13,7 @@ public class ResourceGetHandler implements Handler{
     public void handleRequest(HttpRequest request, DataOutputStream dos) throws IOException, URISyntaxException {
         String[] splitPath = request.getRequestPath().split("\\.");
         String fileType = splitPath[splitPath.length - 1];
-        String filePathPrefix = "./static";
+        String filePathPrefix = "./static/";
         String filePathPostfix = request.getRequestPath().substring(1);
         if(fileType.equals("html") || fileType.equals("ico")) {
             filePathPrefix = "./templates";
