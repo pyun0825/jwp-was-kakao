@@ -34,6 +34,14 @@ public class RequestHeader {
         return this.url;
     }
 
+    public String getPath() {
+        return this.url.split("\\?")[0];
+    }
+
+    public String getQuery() {
+        return this.url.split("\\?")[1];
+    }
+
     public boolean hasContentLength() {
         return this.headers.containsKey("Content-Length");
     }

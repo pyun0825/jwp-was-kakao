@@ -66,8 +66,7 @@ public class RequestHandler implements Runnable {
             return;
         }
         if (url.startsWith("/user/create")) {
-            String[] splitUrl = url.split("\\?");
-            responseRegister(splitUrl[1], dos);
+            responseRegister(httpRequest.getRequestQuery(), dos);
             return;
         }
     }

@@ -30,4 +30,12 @@ public class HttpRequest {
     public String getRequestUrl() {
         return requestHeader.getUrl();
     }
+
+    public String getRequestPath() {
+        return requestHeader.getPath();
+    }
+
+    public String getRequestQuery() {
+        return requestHeader.getQuery();
+    }
 }
