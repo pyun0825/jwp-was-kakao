@@ -15,7 +15,10 @@ public class RequestMappingInfo {
     }
 
     public static RequestMappingInfo of(HttpRequest request) {
-        return new RequestMappingInfo(request.getRequestPath(), request.getHttpMethod());
+        return new RequestMappingInfo(
+                request.getRequestPath().orElseThrow(IllegalArgumentException::new),
+                request.getHttpMethod()
+        );
     }
 
     @Override

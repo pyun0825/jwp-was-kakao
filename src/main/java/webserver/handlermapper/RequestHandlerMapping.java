@@ -7,6 +7,7 @@ import webserver.handler.ResourceGetHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RequestHandlerMapping {
     private final Map<RequestMappingInfo, Handler> mappings;
@@ -26,10 +27,12 @@ public class RequestHandlerMapping {
         return registerHandler(new RequestMappingInfo(path, httpMethod), handler);
     }
 
-    public Handler getHandlerForRequest(HttpRequest httpRequest) {
-        if (httpRequest.getRequestPath().matches(".*\\.[a-z]+$")) {
-            return resourceGetHandler;
+    public Optional<Handler> getHandlerForRequest(HttpRequest httpRequest) {
+        if (httpRequest.getRequestPath()
+                .orElseThrow(IllegalArgumentException::new)
+                .matches(".*\\.[a-z]+$")) {
+            return Optional.of(resourceGetHandler);
         }
-        return mappings.get(RequestMappingInfo.of(httpRequest));
+        return Optional.ofNullable(mappings.get(RequestMappingInfo.of(httpRequest)));
     }
 }
