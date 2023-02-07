@@ -1,6 +1,6 @@
 package utils;
 
-import webserver.RequestParameters;
+import webserver.request.RequestParameters;
 
 public class RequestParameterParser {
     public static RequestParameters parse(String query) {

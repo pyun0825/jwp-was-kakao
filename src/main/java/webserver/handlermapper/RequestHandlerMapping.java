@@ -1,7 +1,7 @@
 package webserver.handlermapper;
 
 import org.springframework.http.HttpMethod;
-import webserver.HttpRequest;
+import webserver.request.HttpRequest;
 import webserver.handler.Handler;
 import webserver.handler.ResourceGetHandler;
 

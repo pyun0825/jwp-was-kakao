@@ -6,6 +6,9 @@ import utils.HeaderParser;
 import utils.IOUtils;
 import webserver.handler.Handler;
 import webserver.handlermapper.RequestHandlerMapping;
+import webserver.request.HttpRequest;
+import webserver.request.RequestHeader;
+import webserver.response.HttpResponse;
 
 import java.io.*;
 import java.net.Socket;

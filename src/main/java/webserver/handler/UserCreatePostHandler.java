@@ -3,9 +3,9 @@ package webserver.handler;
 import db.DataBase;
 import model.User;
 import utils.RequestParameterParser;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
-import webserver.RequestParameters;
+import webserver.request.HttpRequest;
+import webserver.response.HttpResponse;
+import webserver.request.RequestParameters;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

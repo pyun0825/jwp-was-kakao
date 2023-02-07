@@ -1,7 +1,7 @@
 package utils;
 
 import org.springframework.http.HttpMethod;
-import webserver.RequestHeader;
+import webserver.request.RequestHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;

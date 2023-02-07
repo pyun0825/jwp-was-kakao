@@ -1,8 +1,8 @@
 package webserver.handler;
 
 import utils.FileIoUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import webserver.request.HttpRequest;
+import webserver.response.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
