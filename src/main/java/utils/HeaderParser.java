@@ -15,8 +15,9 @@ public class HeaderParser {
 
     private static RequestHeader parseFirstLine(BufferedReader br) throws IOException {
         String line = br.readLine();
-        if (line == null) throw new RuntimeException();
+        if (line == null) throw new IllegalArgumentException();
         String[] splitLine = line.split(" ");
+        if (splitLine.length != 3) throw new IllegalArgumentException();
         return new RequestHeader(
                 HttpMethod.valueOf(splitLine[0]),
                 splitLine[1],
@@ -27,6 +28,7 @@ public class HeaderParser {
         String line = br.readLine();
         while (!"".equals(line)) {
             String[] splitLine = line.split(": ");
+            if (splitLine.length != 2) throw new IllegalArgumentException();
             requestHeader.put(splitLine[0], splitLine[1]);
             line = br.readLine();
             if (line == null) return;

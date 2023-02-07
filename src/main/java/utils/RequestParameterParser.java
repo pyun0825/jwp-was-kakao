@@ -9,7 +9,7 @@ public class RequestParameterParser {
         for (String param : params) {
             String[] splitParam = param.split("=");
             if (splitParam.length != 2) {
-                return null;
+                throw new IllegalArgumentException();
             }
             requestParameters.put(splitParam[0], splitParam[1]);
         }
