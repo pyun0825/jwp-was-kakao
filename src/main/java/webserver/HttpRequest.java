@@ -4,6 +4,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import java.util.Optional;
+
 public class HttpRequest {
     @NonNull
     private final RequestHeader requestHeader;
@@ -19,8 +21,8 @@ public class HttpRequest {
         return requestHeader;
     }
 
-    public String getBody() {
-        return body;
+    public Optional<String> getBody() {
+        return Optional.ofNullable(body);
     }
 
     public HttpMethod getHttpMethod() {
@@ -31,11 +33,11 @@ public class HttpRequest {
         return requestHeader.getUrl();
     }
 
-    public String getRequestPath() {
+    public Optional<String> getRequestPath() {
         return requestHeader.getPath();
     }
 
-    public String getRequestQuery() {
+    public Optional<String> getRequestQuery() {
         return requestHeader.getQuery();
     }
 }

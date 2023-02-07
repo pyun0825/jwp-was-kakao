@@ -2,6 +2,7 @@ package webserver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RequestParameters {
     Map<String, String> params;
@@ -14,7 +15,7 @@ public class RequestParameters {
         this.params.put(key, value);
     }
 
-    public String get(String key) {
-        return this.params.get(key);
+    public Optional<String> get(String key) {
+        return Optional.ofNullable(this.params.get(key));
     }
 }

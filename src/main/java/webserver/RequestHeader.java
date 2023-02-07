@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RequestHeader {
     @NonNull
@@ -34,12 +35,12 @@ public class RequestHeader {
         return this.url;
     }
 
-    public String getPath() {
-        return this.url.split("\\?")[0];
+    public Optional<String> getPath() {
+        return Optional.ofNullable(this.url.split("\\?")[0]);
     }
 
-    public String getQuery() {
-        return this.url.split("\\?")[1];
+    public Optional<String> getQuery() {
+        return Optional.ofNullable(this.url.split("\\?")[1]);
     }
 
     public boolean hasContentLength() {
