@@ -26,18 +26,42 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream();
-             InputStreamReader isr = new InputStreamReader(in);
-             BufferedReader br = new BufferedReader(isr);
-             OutputStream out = connection.getOutputStream();
-             DataOutputStream dos = new DataOutputStream(out))
-        {
+        OutputStream out = null;
+        DataOutputStream dos = null;
+
+        try {
+            InputStream in = connection.getInputStream();
+            InputStreamReader isr = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(isr);
+            out = connection.getOutputStream();
+            dos = new DataOutputStream(out);
+
             HttpRequest httpRequest = getHttpRequestFromInput(br);
-            Handler handler = requestHandlerMapping.getHandlerForRequest(httpRequest);
+
+            Handler handler = requestHandlerMapping.getHandlerForRequest(httpRequest).orElseThrow(IllegalArgumentException::new);
             handler.handleRequest(httpRequest, dos);
+
+            br.close();
+            isr.close();
+            in.close();
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+            HttpResponse.internalServerError().sendResponse(dos);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            HttpResponse.badRequest().sendResponse(dos);
+        } finally {
+            if (dos != null && out != null) {
+                try {
+                    dos.close();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                }
+            }
         }
     }
 
