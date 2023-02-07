@@ -2,19 +2,26 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.HeaderParser;
+import utils.IOUtils;
+import webserver.handler.Handler;
+import webserver.handlermapper.RequestHandlerMapping;
+import webserver.request.HttpRequest;
+import webserver.request.RequestHeader;
+import webserver.response.HttpResponse;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private final RequestHandlerMapping requestHandlerMapping;
 
     private Socket connection;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(RequestHandlerMapping requestHandlerMapping, Socket connectionSocket) {
+        this.requestHandlerMapping = requestHandlerMapping;
         this.connection = connectionSocket;
     }
 
@@ -22,34 +29,51 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello world".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
-        } catch (IOException e) {
+        OutputStream out = null;
+        DataOutputStream dos = null;
+
+        try {
+            InputStream in = connection.getInputStream();
+            InputStreamReader isr = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(isr);
+            out = connection.getOutputStream();
+            dos = new DataOutputStream(out);
+
+            HttpRequest httpRequest = getHttpRequestFromInput(br);
+
+            Handler handler = requestHandlerMapping.getHandlerForRequest(httpRequest).orElseThrow(IllegalArgumentException::new);
+            handler.handleRequest(httpRequest, dos);
+
+            br.close();
+            isr.close();
+            in.close();
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
+            HttpResponse.internalServerError().sendResponse(dos);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            HttpResponse.badRequest().sendResponse(dos);
+        } finally {
+            if (dos != null && out != null) {
+                try {
+                    dos.close();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                }
+            }
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8 \r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + " \r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    private HttpRequest getHttpRequestFromInput(BufferedReader br) throws IOException {
+        RequestHeader requestHeader = HeaderParser.parse(br);
+        String body = null;
+        if (requestHeader.hasContentLength()) {
+            body = IOUtils.readData(br, requestHeader.getContentLength());
         }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        return new HttpRequest(requestHeader, body);
     }
 }
